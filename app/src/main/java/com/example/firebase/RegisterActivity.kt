@@ -21,6 +21,8 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var buttonRegister: Button
     private lateinit var textViewLogin: TextView
 
+    private lateinit var authStateListener: FirebaseAuth.AuthStateListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,6 +46,31 @@ class RegisterActivity : AppCompatActivity() {
         textViewLogin = findViewById(R.id.textViewLogin)
         textViewLogin.setOnClickListener {
             this.goToLogin()
+        }
+
+        // Verificacion de sesion
+        this.checkUser()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        auth.addAuthStateListener(authStateListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        auth.removeAuthStateListener(authStateListener)
+    }
+
+    private fun checkUser() {
+        // Verificacion del usuario
+        authStateListener = FirebaseAuth.AuthStateListener { auth ->
+            if (auth.currentUser != null) {
+                // Cambiando la vista
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
     }
 
